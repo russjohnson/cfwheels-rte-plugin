@@ -133,7 +133,6 @@
             <cfhtmlhead text="#jsFiles##jsFunctions#" />
             <cfset request.ckeditorran = true>
         </cfif>
-        
     </cffunction>
     
 </cfcomponent>
