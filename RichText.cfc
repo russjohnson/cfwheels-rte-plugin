@@ -1,4 +1,4 @@
-<cfcomponent output="false">
+<cfcomponent output="false" mixin="Controller">
 
     <cfscript>
     /* 
@@ -10,30 +10,31 @@
         this.version = "1.0.1";
         return this;
     }
+
     </cfscript>
     
     <cffunction name="richTextField" returntype="string" access="public" output="false">
-	    <cfargument name="objectName" type="any" required="true" hint="See documentation for @textField">
-    	<cfargument name="property" type="string" required="true" hint="See documentation for @textField">
-    	<cfargument name="label" type="string" required="false" default="#application.wheels.functions.textArea.label#" hint="See documentation for @textField">
-    	<cfargument name="labelPlacement" type="string" required="false" default="#application.wheels.functions.textArea.labelPlacement#" hint="See documentation for @textField">
-    	<cfargument name="prepend" type="string" required="false" default="#application.wheels.functions.textArea.prepend#" hint="See documentation for @textField">
-    	<cfargument name="append" type="string" required="false" default="#application.wheels.functions.textArea.append#" hint="See documentation for @textField">
-    	<cfargument name="prependToLabel" type="string" required="false" default="#application.wheels.functions.textArea.prependToLabel#" hint="See documentation for @textField">
-    	<cfargument name="appendToLabel" type="string" required="false" default="#application.wheels.functions.textArea.appendToLabel#" hint="See documentation for @textField">
-    	<cfargument name="errorElement" type="string" required="false" default="#application.wheels.functions.textArea.errorElement#" hint="See documentation for @textField">
+		<cfargument name="objectName" type="any" required="true" hint="See documentation for @textField.">
+		<cfargument name="property" type="string" required="true" hint="See documentation for @textField.">
+		<cfargument name="association" type="string" required="false" hint="See documentation for @textfield.">
+		<cfargument name="position" type="string" required="false" hint="See documentation for @textfield.">
+		<cfargument name="label" type="string" required="false" hint="See documentation for @textField.">
+		<cfargument name="labelPlacement" type="string" required="false" hint="See documentation for @textField.">
+		<cfargument name="prepend" type="string" required="false" hint="See documentation for @textField.">
+		<cfargument name="append" type="string" required="false" hint="See documentation for @textField.">
+		<cfargument name="prependToLabel" type="string" required="false" hint="See documentation for @textField.">
+		<cfargument name="appendToLabel" type="string" required="false" hint="See documentation for @textField.">
+		<cfargument name="errorElement" type="string" required="false" hint="See documentation for @textField.">
+		<cfargument name="errorClass" type="string" required="false" hint="See documentation for @textField.">
     	<cfargument name="editor" type="string" required="false" default="markitup" hint="Must contain the name of one of the supported RTE's.">
-    	<cfargument name="includeJSLibrary" type="string" required="false" default="true" hint="Tells the plugin wether or not it should add the primary JS library to the html head section.">
+    	<cfargument name="includeJSLibrary" type="boolean" required="false" default="true" hint="Tells the plugin wether or not it should add the primary JS library to the html head section.">
     	<cfscript>
-    		var loc = {};
-    		$args(name="textArea", reserved="name", args=arguments);
-    		loc.before = $formBeforeElement(argumentCollection=arguments);
-    		loc.after = $formAfterElement(argumentCollection=arguments);
-    		arguments.name = $tagName(arguments.objectName, arguments.property);
-    		if (!StructKeyExists(arguments, "id"))
-    			arguments.id = $tagId(arguments.objectName, arguments.property);
-    		loc.content = $formValue(argumentCollection=arguments);
-    		loc.returnValue = loc.before & $element(name="textarea", skip="objectName,property,label,labelPlacement,prepend,append,prependToLabel,appendToLabel,errorElement", skipStartingWith="label", content=loc.content, attributes=arguments) & loc.after;
+			var loc = {};
+
+    		loc.ret = textArea(argumentCollection=arguments);
+    		
+			if (!StructKeyExists(arguments, "id"))
+				arguments.id = $tagId(arguments.objectName, arguments.property);
     		
     		// call our editor methods
     		if (arguments.editor is 'markitup'){
@@ -43,29 +44,28 @@
     		    $ckeditor(argumentCollection=arguments);
     		}
     	</cfscript>
-    	<cfreturn loc.returnValue>
+    	<cfreturn loc.ret>
     </cffunction>
     
     
     <cffunction name="richTextTag" returntype="string" access="public" output="false">
-        <cfargument name="name" type="string" required="true" hint="See documentation for @textFieldTag">
-        <cfargument name="content" type="string" required="false" default="" hint="Content to display in `textarea` by default">
-        <cfargument name="label" type="string" required="false" default="#application.wheels.functions.textAreaTag.label#" hint="See documentation for @textField">
-        <cfargument name="labelPlacement" type="string" required="false" default="#application.wheels.functions.textAreaTag.labelPlacement#" hint="See documentation for @textField">
-        <cfargument name="prepend" type="string" required="false" default="#application.wheels.functions.textAreaTag.prepend#" hint="See documentation for @textField">
-        <cfargument name="append" type="string" required="false" default="#application.wheels.functions.textAreaTag.append#" hint="See documentation for @textField">
-        <cfargument name="prependToLabel" type="string" required="false" default="#application.wheels.functions.textAreaTag.prependToLabel#" hint="See documentation for @textField">
-        <cfargument name="appendToLabel" type="string" required="false" default="#application.wheels.functions.textAreaTag.appendToLabel#" hint="See documentation for @textField">
+		<cfargument name="name" type="string" required="true" hint="See documentation for @textFieldTag.">
+		<cfargument name="content" type="string" required="false" default="" hint="Content to display in `textarea` on page load.">
+		<cfargument name="label" type="string" required="false" hint="See documentation for @textField.">
+		<cfargument name="labelPlacement" type="string" required="false" hint="See documentation for @textField.">
+		<cfargument name="prepend" type="string" required="false" hint="See documentation for @textField.">
+		<cfargument name="append" type="string" required="false" hint="See documentation for @textField.">
+		<cfargument name="prependToLabel" type="string" required="false" hint="See documentation for @textField.">
+		<cfargument name="appendToLabel" type="string" required="false" hint="See documentation for @textField.">
         <cfargument name="editor" type="string" required="false" default="markitup" hint="Must contain the name of one of the supported RTE's.">
-    	<cfargument name="includeJSLibrary" type="string" required="false" default="true" hint="Tells the plugin wether or not it should add the primary JS library to the html head section.">
+    	<cfargument name="includeJSLibrary" type="boolean" required="false" default="true" hint="Tells the plugin wether or not it should add the primary JS library to the html head section.">
         <cfscript>
             var loc = {};
-            arguments.property = arguments.name;
-            arguments.objectName = {};
-            arguments.objectName[arguments.name] = arguments.content;
-            StructDelete(arguments, "name");
-            StructDelete(arguments, "content");
-            loc.returnValue = textArea(argumentCollection=arguments);
+            
+            loc.ret  = textAreaTag(argumentCollection=arguments);
+            
+			if (!StructKeyExists(arguments, "id"))
+				arguments.id = $tagId(StructNew(), arguments.name);
             
             // call our editor methods
     		if (arguments.editor is 'markitup'){
@@ -75,64 +75,54 @@
     		    $ckeditor(argumentCollection=arguments);
     		}
         </cfscript>
-        <cfreturn loc.returnValue>
+        <cfreturn ret>
     </cffunction>
 
     <!--- *********************** EDITOR SPECIFIC METHODS *************************** --->
-    
+	
+	<cffunction name="$PluginRTEIncludeJQuery" output="false">
+		<cfargument name="includeJSLibrary" type="boolean" required="false" default="true">
+		<cfif arguments.includeJSLibrary && !StructKeyExists(request, "PluginRTEIncludedJQuery")>
+			<cfset request.PluginRTEIncludedJQuery = true>
+			<cfhtmlhead text="<script src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js' type='text/javascript'></script>" />
+		</cfif>
+	</cffunction>
+	
+	
     <cffunction name="$markItUp" output="false">
-        <cfargument name="includeJSLibrary" type="any" required="false" default="true">
-        
-        <cfset var jsFiles = ''>
-        <cfset var cssFiles = ''>
-        <cfset var jsFunctions = ''>
+		<cfargument name="id" type="string" required="true">
+		<cfargument name="includeJSLibrary" type="boolean" required="false" default="true">
+        <cfset var loc = {}>
+		<cfset loc.ret = []>
+		<cfset ArrayAppend(loc.ret, '<script type="text/javascript">$(document).ready(function(){$("###arguments.id#").markItUp(mySettings);});</script>')>
             
-        <cfif structKeyExists(request,'markitupran') is false>
-            <cfif arguments.includeJSLibrary is true>
-                <cfset jsFiles = '<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js" type="text/javascript"></script>'>
-            </cfif>
-            
-            <cfset jsFiles = jsFiles & '<script src="/files/plugins/richtext/markitup/jquery.markitup.pack.js" type="text/javascript"></script><script src="/files/plugins/richtext/markitup/sets/html/set.js" type="text/javascript"></script>'>
-        
-            <cfset cssFiles = cssFiles & '<link rel="stylesheet" type="text/css" href="/files/plugins/richtext/markitup/skins/simple/style.css" /><link rel="stylesheet" type="text/css" href="/files/plugins/richtext/markitup/sets/html/style.css" />'>
-        
-            <cfset jsFunctions = jsFunctions & '<script type="text/javascript">$(document).ready(function(){
-                  // Add markItUp! to our textarea
-                	$(".rteditor").markItUp(mySettings);
-                });</script>'>
-                
-            <cfhtmlhead text="#jsFiles##cssFiles##jsFunctions#" />
-            <cfset request.markitupran = true>
-        </cfif>
+        <cfif !structKeyExists(request,'PluginRTEIncludedMarkitup')>
+			<cfset request.PluginRTEIncludedMarkitup = true>
+			<cfset ArrayPrepend(loc.ret, '<link rel="stylesheet" type="text/css" href="#application.wheels.webPath#plugins/richtext/editors/markitup/skins/simple/style.css" /><link rel="stylesheet" type="text/css" href="#application.wheels.webPath#plugins/richtext/editors/markitup/sets/html/style.css" />')>
+			<cfset ArrayPrepend(loc.ret, '<script src="#application.wheels.webPath#plugins/richtext/editors/markitup/jquery.markitup.pack.js" type="text/javascript"></script><script src="#application.wheels.webPath#plugins/richtext/editors/markitup/sets/html/set.js" type="text/javascript"></script>')>
+		</cfif>
+		
+		<cfhtmlhead text="#ArrayToList(loc.ret, '')#">
     </cffunction>
     
     <cffunction name="$ckeditor" output="false" >
-        <cfargument name="includeJSLibrary" type="any" required="false" default="true">
-        
-        <cfset var jsFiles = ''>
-        <cfset var jsFunctions = ''>
-        <cfset var options = ''>
-            
+		<cfargument name="id" type="string" required="true">
+		<cfargument name="includeJSLibrary" type="boolean" required="false" default="true">
+		<cfset var loc = {}>
+		
+		<cfset loc.ret = []>
+		<cfset ArrayAppend(loc.ret, '<script type="text/javascript">$(document).ready(function(){$("###arguments.id#").ckeditor(')>
         <cfif structKeyExists(arguments, 'options')>
-            <cfset options = "function() {#arguments.options#}">
+           <cfset ArrayAppend(loc.ret, 'function() {#arguments.options#}')>
         </cfif>
+		<cfset ArrayAppend(loc.ret, ');});</script>')>
+		
+        <cfif !structKeyExists(request,'PluginRTEIncludedCKEditor')>
+			<cfset request.PluginRTEIncludedCKEditor = true>
+			<cfset ArrayPrepend(loc.ret, '<script type="text/javascript" src="#application.wheels.webPath#plugins/richtext/editors/ckeditor/ckeditor.js"></script><script type="text/javascript" src="#application.wheels.webPath#plugins/richtext/editors/ckeditor/adapters/jquery.js"></script>')>
+		</cfif>
         
-        <cfif structKeyExists(request,'ckeditorran') is false>
-            <cfif arguments.includeJSLibrary is true>
-                <cfset jsFiles = '<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js" type="text/javascript"></script>'>
-            </cfif>
-            
-            <cfset jsFiles = jsFiles & '<script type="text/javascript" src="/files/plugins/richtext/ckeditor/ckeditor.js"></script> 
-<script type="text/javascript" src="/files/plugins/richtext/ckeditor/adapters/jquery.js"></script>'>
-        
-            <cfset jsFunctions = jsFunctions & '<script type="text/javascript">$(document).ready(function(){
-                  // Add ckEditor to our textarea
-                	$(".rteditor").ckeditor(#options#);
-                });</script>'>
-                
-            <cfhtmlhead text="#jsFiles##jsFunctions#" />
-            <cfset request.ckeditorran = true>
-        </cfif>
+        <cfhtmlhead text="#ArrayToList(loc.ret, '')#">
     </cffunction>
     
 </cfcomponent>
